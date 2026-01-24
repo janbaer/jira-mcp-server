@@ -28,6 +28,7 @@ export class JiraClient {
 
   /**
    * Convert plain text description to Atlassian Document Format (ADF)
+   * Simple conversion: splits on double newlines to create paragraphs
    */
   private toADF(text: string): AtlassianDocumentFormat {
     // Split text into paragraphs
@@ -69,9 +70,12 @@ export class JiraClient {
 
     // Add optional description in ADF format
     if (input.description) {
-      (body.fields as Record<string, unknown>).description = this.toADF(
-        input.description
-      );
+      // If description is already an ADF object, use it directly
+      // Otherwise, convert plain text to ADF
+      (body.fields as Record<string, unknown>).description =
+        typeof input.description === "string"
+          ? this.toADF(input.description)
+          : input.description;
     }
 
     // Add optional priority

@@ -42,16 +42,30 @@ The `deploy` script builds the executable and copies it to `~/bin` for system-wi
 
 ### Core Components
 
-**src/index.ts** - MCP server entry point
-- Creates `McpServer` instance from `@modelcontextprotocol/sdk`
+**src/index.ts** - Main entry point
+- Orchestrates server startup: config, client, server creation, and start
+- Handles help display via command-line arguments
+- Shebang (`#!/usr/bin/env bun`) allows direct execution without `bun run` prefix
+
+**src/config.ts** - Environment configuration
+- Validates required environment variables
+- Returns `JiraConfig` with validated settings
+- Provides detailed error messages for missing variables
+
+**src/help.ts** - Help text display
+- Shows usage instructions and configuration examples
+- Displays required environment variables
+- Provides setup instructions for Claude Desktop, Claude Code, and other MCP clients
+
+**src/server.ts** - MCP server setup
+- Creates and configures `McpServer` instance
 - Registers the `jira-create-issue` tool with Zod schema validation
 - Connects server to stdio transport for MCP communication
 - All logging must go to stderr (stdout is reserved for MCP protocol)
-- Shebang (`#!/usr/bin/env bun`) allows direct execution without `bun run` prefix
 
 **src/jira-client.ts** - Jira REST API client
 - Handles authentication via Basic Auth (email:token base64 encoded)
-- Converts plain text descriptions to Atlassian Document Format (ADF)
+- Accepts both plain text (simple paragraph conversion) and pre-formatted ADF objects
 - Makes API calls to Jira REST API v3
 - Provides detailed error messages by parsing Jira error responses
 
@@ -63,7 +77,11 @@ The `deploy` script builds the executable and copies it to `~/bin` for system-wi
 
 ### Key Design Patterns
 
-**ADF Conversion**: The Jira Cloud API requires descriptions in Atlassian Document Format (ADF), not plain text. The `toADF()` method in `jira-client.ts` converts plain text to ADF by splitting on double newlines and creating paragraph nodes.
+**ADF Conversion**: The Jira Cloud API requires descriptions in Atlassian Document Format (ADF), not plain text. The MCP server accepts both:
+- **Plain text**: Simple conversion to paragraph nodes (for basic use cases)
+- **Pre-formatted ADF objects**: Passed directly to Jira API (for advanced formatting with panels, headings, lists, etc.)
+
+This separation of concerns means the MCP server is a generic Jira API client, while formatting logic (like TODO panels, acceptance criteria panels) lives in the calling code/commands.
 
 **MCP Tool Pattern**: Tools are registered with the server using `server.tool()` which takes:
 1. Tool name (string)
@@ -96,6 +114,6 @@ npx @modelcontextprotocol/inspector ./dist/jira-mcp-server
 When adding new Jira operations:
 1. Add input/response types to `types.ts`
 2. Add method to `JiraClient` class in `jira-client.ts`
-3. Register new tool in `index.ts` with proper Zod schema
+3. Register new tool in `server.ts` within `createMcpServer()` function
 4. Handle errors and return structured JSON response
 5. Update README.md with new tool documentation

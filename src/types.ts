@@ -18,8 +18,8 @@ export interface JiraConfig {
 export interface CreateIssueInput {
   /** Summary/title of the issue */
   summary: string;
-  /** Description of the issue (optional) */
-  description?: string;
+  /** Description of the issue - either plain text (converted to simple paragraphs) or pre-formatted ADF object */
+  description?: string | AtlassianDocumentFormat;
   /** Issue type (e.g., "Task", "Bug", "Story") - defaults to "Task" */
   issueType?: string;
   /** Priority (e.g., "Highest", "High", "Medium", "Low", "Lowest") */
@@ -52,15 +52,10 @@ export interface JiraErrorResponse {
 
 /**
  * Atlassian Document Format (ADF) for descriptions
+ * Flexible structure that supports paragraphs, headings, panels, lists, etc.
  */
 export interface AtlassianDocumentFormat {
   type: "doc";
   version: 1;
-  content: Array<{
-    type: "paragraph";
-    content: Array<{
-      type: "text";
-      text: string;
-    }>;
-  }>;
+  content: any[]; // Flexible array to support all ADF node types
 }

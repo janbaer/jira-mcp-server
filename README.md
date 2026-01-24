@@ -6,7 +6,9 @@ An MCP (Model Context Protocol) server for creating Jira issues via the REST API
 
 - Create Jira issues with a single tool call
 - Support for all standard issue fields (summary, description, type, priority, labels)
-- Proper Atlassian Document Format (ADF) for descriptions
+- Flexible description input:
+  - Plain text → automatic conversion to basic ADF paragraphs
+  - Pre-formatted ADF objects → full control over formatting (panels, headings, lists, etc.)
 - Error handling with detailed error messages
 
 ## Prerequisites
@@ -177,14 +179,42 @@ Creates a new issue in Jira.
 
 **Parameters:**
 
-| Parameter     | Type       | Required | Description                                                  |
-| ------------- | ---------- | -------- | ------------------------------------------------------------ |
-| `summary`     | `string`   | Yes      | Summary/title of the issue                                   |
-| `description` | `string`   | No       | Detailed description of the issue                            |
-| `issueType`   | `string`   | No       | Issue type (default: "Task")                                 |
-| `priority`    | `string`   | No       | Priority level ("Highest", "High", "Medium", "Low", "Lowest")|
-| `labels`      | `string[]` | No       | Labels to add to the issue                                   |
-| `projectKey`  | `string`   | No       | Override the default project key                             |
+| Parameter     | Type              | Required | Description                                                  |
+| ------------- | ----------------- | -------- | ------------------------------------------------------------ |
+| `summary`     | `string`          | Yes      | Summary/title of the issue                                   |
+| `description` | `string` or `ADF` | No       | Description as plain text OR pre-formatted ADF object        |
+| `issueType`   | `string`          | No       | Issue type (default: "Task")                                 |
+| `priority`    | `string`          | No       | Priority level ("Highest", "High", "Medium", "Low", "Lowest")|
+| `labels`      | `string[]`        | No       | Labels to add to the issue                                   |
+| `projectKey`  | `string`          | No       | Override the default project key                             |
+
+**Description Formatting:**
+
+You can provide the description in two ways:
+
+1. **Plain text** (simple):
+   ```
+   "description": "Main description text.\n\nAnother paragraph."
+   ```
+   The server converts this to basic ADF paragraphs.
+
+2. **Pre-formatted ADF object** (advanced):
+   ```json
+   "description": {
+     "type": "doc",
+     "version": 1,
+     "content": [
+       { "type": "paragraph", "content": [{ "type": "text", "text": "Main description" }] },
+       { "type": "heading", "attrs": { "level": 3 }, "content": [{ "type": "text", "text": "TODO" }] },
+       { "type": "panel", "attrs": { "panelType": "error" }, "content": [
+         { "type": "paragraph", "content": [{ "type": "text", "text": "First task" }] }
+       ]}
+     ]
+   }
+   ```
+   The server passes this directly to Jira, giving you full control over formatting (panels, headings, lists, etc.).
+
+Panel types: "error" (red), "info" (blue), "warning" (yellow), "success" (green), "note" (purple)
 
 **Example Response:**
 
