@@ -12,6 +12,9 @@ This is an MCP (Model Context Protocol) server that exposes Jira REST API functi
 # Build standalone executable with Bun runtime included
 bun run build
 
+# Build and deploy to ~/bin directory
+bun run deploy
+
 # Development mode (run from source)
 bun run dev
 
@@ -34,6 +37,8 @@ See `.env.example` for reference.
 ### Build System
 
 This project uses **Bun's `--compile` flag** to create a standalone executable that includes the Bun runtime and all dependencies. The build command (`bun build src/index.ts --compile --outfile dist/jira-mcp-server`) produces a single executable file that can run without a separate Bun installation.
+
+The `deploy` script builds the executable and copies it to `~/bin` for system-wide access.
 
 ### Core Components
 

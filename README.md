@@ -55,6 +55,15 @@ bun run build
 
 This creates a standalone executable at `dist/jira-mcp-server` that includes the Bun runtime and all dependencies.
 
+### Deploy
+
+```bash
+# Build and deploy to ~/bin directory
+bun run deploy
+```
+
+This builds the executable and copies it to `~/bin/jira-mcp-server` for system-wide access.
+
 ### Development Mode
 
 ```bash
@@ -195,7 +204,6 @@ jira-mcp-server/
 ├── dist/
 │   └── jira-mcp-server  # Standalone executable (after bun run build)
 ├── package.json
-├── tsconfig.json
 └── README.md
 ```
 
@@ -204,6 +212,7 @@ jira-mcp-server/
 | Script        | Description                                                      |
 | ------------- | ---------------------------------------------------------------- |
 | `build`       | Build standalone executable with Bun runtime included            |
+| `deploy`      | Build and copy executable to ~/bin directory                     |
 | `dev`         | Run source directly with Bun (for development)                   |
 
 ## Future Improvements
