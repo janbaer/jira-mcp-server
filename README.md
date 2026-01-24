@@ -230,6 +230,32 @@ Panel types: "error" (red), "info" (blue), "warning" (yellow), "success" (green)
 }
 ```
 
+## Example Commands
+
+### `jira-ticket` Command
+
+An interactive command for drafting and creating Jira tickets with proper ADF formatting. This command demonstrates how to use the MCP server with advanced formatting features.
+
+**Features:**
+- Interactive ticket creation for Stories, Bugs, and Maintenance tasks
+- Smart question flow based on ticket type
+- Automatic ADF construction with red error panels for TODO and Acceptance Criteria
+- Grammar checking and refinement workflow
+- Integration with jira-mcp-server
+
+**Location:** `command/jira-ticket.md`
+
+**Usage:**
+```bash
+/jira-ticket [optional summary]
+```
+
+The command will guide you through creating a well-structured ticket and automatically format it with:
+- Headings for TODO and Acceptance Criteria sections
+- Red error panels for each TODO item (easily changed to green when completed)
+- Red error panels for each acceptance criterion
+- Proper paragraph formatting for descriptions
+
 ## Project Structure
 
 ```
