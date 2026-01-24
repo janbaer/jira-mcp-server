@@ -3,30 +3,23 @@
   "version": "1.0.0",
   "description": "MCP server for creating Jira issues via REST API",
   "type": "module",
-  "main": "dist/index.js",
+  "main": "dist/jira-mcp-server",
   "bin": {
-    "jira-mcp-server": "./dist/index.js"
+    "jira-mcp-server": "./dist/jira-mcp-server"
   },
   "scripts": {
-    "build": "tsc",
-    "build:bun": "bun build src/index.ts --outdir dist --target node",
-    "start": "node dist/index.js",
-    "start:bun": "bun run dist/index.js",
-    "dev": "node --import tsx src/index.ts",
-    "dev:bun": "bun run src/index.ts",
-    "typecheck": "tsc --noEmit"
+    "build": "bun build src/index.ts --compile --outfile dist/jira-mcp-server",
+    "dev": "bun run src/index.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.1",
     "zod": "^3.25.34"
   },
   "devDependencies": {
-    "@types/node": "^22.10.0",
-    "tsx": "^4.19.0",
-    "typescript": "^5.7.3"
+    "@types/node": "^22.10.0"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "bun": ">=1.0.0"
   },
   "license": "MIT"
 }

@@ -1,6 +1,6 @@
 # Jira MCP Server
 
-An MCP (Model Context Protocol) server for creating Jira issues via the REST API. Works with both Node.js and Bun.
+An MCP (Model Context Protocol) server for creating Jira issues via the REST API. Built with Bun.
 
 ## Features
 
@@ -11,7 +11,7 @@ An MCP (Model Context Protocol) server for creating Jira issues via the REST API
 
 ## Prerequisites
 
-- [Node.js](https://nodejs.org) 18+ or [Bun](https://bun.sh) v1.0+
+- [Bun](https://bun.sh) v1.0+
 - A Jira Cloud instance
 - Jira API token (see [Atlassian API tokens](https://id.atlassian.com/manage-profile/security/api-tokens))
 
@@ -23,8 +23,6 @@ git clone <your-repo-url>
 cd jira-mcp-server
 
 # Install dependencies
-npm install
-# or with Bun
 bun install
 ```
 
@@ -51,12 +49,11 @@ The server requires the following environment variables:
 ### Build
 
 ```bash
-# Build with TypeScript compiler
-npm run build
-
-# Or build with Bun (faster single-file output)
-npm run build:bun
+# Build standalone executable with Bun runtime included
+bun run build
 ```
+
+This creates a standalone executable at `dist/jira-mcp-server` that includes the Bun runtime and all dependencies.
 
 ### Development Mode
 
@@ -67,35 +64,35 @@ export JIRA_EMAIL="user@example.com"
 export JIRA_API_TOKEN="your-token"
 export JIRA_PROJECT="PROJ"
 
-# Run with Node.js + tsx
-npm run dev
+# Run directly from source
+bun run dev
 
-# Or run with Bun (faster startup)
-npm run dev:bun
+# Or run the source file directly (since it has #!/usr/bin/env bun shebang)
+./src/index.ts
 ```
 
 ### Production Mode
 
 ```bash
-# Build first
-npm run build
+# Build the executable first
+bun run build
 
-# Run with Node.js
-npm run start
-
-# Or run with Bun
-npm run start:bun
+# Run the standalone executable
+./dist/jira-mcp-server
 ```
 
 ### Testing with MCP Inspector
 
 ```bash
+# Build first
+bun run build
+
 # Run the inspector with your server
 JIRA_URL="https://your-domain.atlassian.net" \
 JIRA_EMAIL="user@example.com" \
 JIRA_API_TOKEN="your-token" \
 JIRA_PROJECT="PROJ" \
-npx @modelcontextprotocol/inspector node dist/index.js
+npx @modelcontextprotocol/inspector ./dist/jira-mcp-server
 ```
 
 ## Integration with MCP Clients
@@ -107,12 +104,12 @@ Add the following to your Claude Desktop configuration file:
 **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
 **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
 
+Production (using built executable):
 ```json
 {
   "mcpServers": {
     "jira": {
-      "command": "node",
-      "args": ["/absolute/path/to/jira-mcp-server/dist/index.js"],
+      "command": "/absolute/path/to/jira-mcp-server/dist/jira-mcp-server",
       "env": {
         "JIRA_URL": "https://your-domain.atlassian.net",
         "JIRA_EMAIL": "user@example.com",
@@ -124,8 +121,7 @@ Add the following to your Claude Desktop configuration file:
 }
 ```
 
-Or using Bun for development:
-
+Development (running from source):
 ```json
 {
   "mcpServers": {
@@ -148,13 +144,13 @@ Or using Bun for development:
 1. Open Cursor Settings → Features → MCP
 2. Add a new MCP server with:
    - **Transport type:** stdio
-   - **Command:** `node /absolute/path/to/jira-mcp-server/dist/index.js`
+   - **Command:** `/absolute/path/to/jira-mcp-server/dist/jira-mcp-server`
 3. Set the environment variables in Cursor's settings
 
 ### Claude Code
 
 ```bash
-claude mcp add jira node /absolute/path/to/jira-mcp-server/dist/index.js
+claude mcp add jira /absolute/path/to/jira-mcp-server/dist/jira-mcp-server
 ```
 
 ## Tool Reference
@@ -196,23 +192,19 @@ jira-mcp-server/
 │   ├── index.ts         # MCP server entry point
 │   ├── jira-client.ts   # Jira REST API client
 │   └── types.ts         # TypeScript type definitions
-├── dist/                # Built output (after npm run build)
+├── dist/
+│   └── jira-mcp-server  # Standalone executable (after bun run build)
 ├── package.json
 ├── tsconfig.json
 └── README.md
 ```
 
-## Available npm Scripts
+## Available Scripts
 
-| Script        | Description                              |
-| ------------- | ---------------------------------------- |
-| `build`       | Build with TypeScript compiler           |
-| `build:bun`   | Build with Bun bundler                   |
-| `start`       | Run built version with Node.js           |
-| `start:bun`   | Run built version with Bun               |
-| `dev`         | Run source directly with Node.js + tsx   |
-| `dev:bun`     | Run source directly with Bun             |
-| `typecheck`   | Run TypeScript type checking             |
+| Script        | Description                                                      |
+| ------------- | ---------------------------------------------------------------- |
+| `build`       | Build standalone executable with Bun runtime included            |
+| `dev`         | Run source directly with Bun (for development)                   |
 
 ## Future Improvements
 

@@ -4,29 +4,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is an MCP (Model Context Protocol) server that exposes Jira REST API functionality to MCP clients like Claude Desktop, Cursor, and Claude Code. It allows LLMs to create Jira issues through a single tool call.
+This is an MCP (Model Context Protocol) server that exposes Jira REST API functionality to MCP clients like Claude Desktop, Cursor, and Claude Code. It allows LLMs to create Jira issues through a single tool call. Built with Bun.
 
 ## Development Commands
 
 ```bash
-# Type checking (always run before committing)
-npm run typecheck
+# Build standalone executable with Bun runtime included
+bun run build
 
-# Build with TypeScript compiler (generates dist/ with type declarations)
-npm run build
+# Development mode (run from source)
+bun run dev
 
-# Build with Bun bundler (faster, single-file output)
-npm run build:bun
-
-# Development mode (hot reload with tsx)
-npm run dev
-
-# Development mode with Bun (faster startup)
-npm run dev:bun
-
-# Production mode (requires build first)
-npm run start        # Node.js
-npm run start:bun    # Bun
+# Run the built executable
+./dist/jira-mcp-server
 ```
 
 ## Environment Setup
@@ -41,6 +31,10 @@ See `.env.example` for reference.
 
 ## Architecture
 
+### Build System
+
+This project uses **Bun's `--compile` flag** to create a standalone executable that includes the Bun runtime and all dependencies. The build command (`bun build src/index.ts --compile --outfile dist/jira-mcp-server`) produces a single executable file that can run without a separate Bun installation.
+
 ### Core Components
 
 **src/index.ts** - MCP server entry point
@@ -48,6 +42,7 @@ See `.env.example` for reference.
 - Registers the `jira-create-issue` tool with Zod schema validation
 - Connects server to stdio transport for MCP communication
 - All logging must go to stderr (stdout is reserved for MCP protocol)
+- Shebang (`#!/usr/bin/env bun`) allows direct execution without `bun run` prefix
 
 **src/jira-client.ts** - Jira REST API client
 - Handles authentication via Basic Auth (email:token base64 encoded)
@@ -83,8 +78,12 @@ See `.env.example` for reference.
 Use the MCP Inspector to test the server locally:
 
 ```bash
+# Build first
+bun run build
+
+# Run inspector
 JIRA_URL="..." JIRA_EMAIL="..." JIRA_API_TOKEN="..." JIRA_PROJECT="..." \
-npx @modelcontextprotocol/inspector node dist/index.js
+npx @modelcontextprotocol/inspector ./dist/jira-mcp-server
 ```
 
 ## Common Patterns
