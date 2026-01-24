@@ -46,6 +46,13 @@ The server requires the following environment variables:
 
 ## Usage
 
+### Quick Reference
+
+```bash
+# Display setup instructions and configuration examples
+./dist/jira-mcp-server --help
+```
+
 ### Build
 
 ```bash
