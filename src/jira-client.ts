@@ -4,7 +4,7 @@ import type {
   CreateIssueResponse,
   JiraErrorResponse,
   AtlassianDocumentFormat,
-} from "./types.js";
+} from "./types";
 
 /**
  * Client for interacting with the Jira REST API

@@ -1,4 +1,4 @@
-import type { JiraConfig } from "./types.js";
+import type { JiraConfig } from "./types";
 
 export function getConfig(): JiraConfig {
   const jiraUrl = process.env.JIRA_URL;

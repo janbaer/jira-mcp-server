@@ -2,16 +2,17 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 
-import { JiraClient } from "./jira-client.js";
-import type { JiraConfig } from "./types.js";
-import { VERSION } from "./version.js";
+import { JiraClient } from "./jira-client";
+import type { JiraConfig } from "./types";
+import { VERSION, NAME } from "./version";
+import { adfSchema } from "./adf-schema";
 
 export function createMcpServer(
   config: JiraConfig,
   jiraClient: JiraClient
 ): McpServer {
   const server = new McpServer({
-    name: "jira-mcp-server",
+    name: NAME,
     version: VERSION,
   });
 
@@ -26,11 +27,7 @@ export function createMcpServer(
       description: z
         .union([
           z.string(),
-          z.object({
-            type: z.literal("doc"),
-            version: z.literal(1),
-            content: z.array(z.any()),
-          }),
+          adfSchema,
         ])
         .optional()
         .describe(

@@ -8,17 +8,19 @@
     "jira-mcp-server": "./dist/jira-mcp-server"
   },
   "scripts": {
-    "prebuild": "bun run scripts/generate-version.ts",
     "build": "bun build src/index.ts --compile --outfile dist/jira-mcp-server",
     "deploy": "bun run build && cp dist/jira-mcp-server ~/bin/jira-mcp-server",
-    "dev": "bun run src/index.ts"
+    "dev": "bun run src/index.ts",
+    "test": "bun test",
+    "lint": "tsc --noEmit"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.1",
     "zod": "^3.25.34"
   },
   "devDependencies": {
-    "@types/node": "^22.10.0"
+    "@types/node": "^22.10.0",
+    "bun-types": "^1.3.6"
   },
   "engines": {
     "bun": ">=1.0.0"

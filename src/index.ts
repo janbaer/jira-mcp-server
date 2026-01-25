@@ -1,8 +1,8 @@
 #!/usr/bin/env bun
-import { JiraClient } from "./jira-client.js";
-import { getConfig } from "./config.js";
-import { showHelp } from "./help.js";
-import { createMcpServer, startServer } from "./server.js";
+import { JiraClient } from "./jira-client";
+import { getConfig } from "./config";
+import { showHelp } from "./help";
+import { createMcpServer, startServer } from "./server";
 
 async function main(): Promise<void> {
   const config = getConfig();
