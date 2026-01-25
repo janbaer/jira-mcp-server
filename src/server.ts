@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import { JiraClient } from "./jira-client.js";
 import type { JiraConfig } from "./types.js";
+import { VERSION } from "./version.js";
 
 export function createMcpServer(
   config: JiraConfig,
@@ -11,7 +12,7 @@ export function createMcpServer(
 ): McpServer {
   const server = new McpServer({
     name: "jira-mcp-server",
-    version: "1.0.0",
+    version: VERSION,
   });
 
   server.tool(

@@ -8,6 +8,7 @@
     "jira-mcp-server": "./dist/jira-mcp-server"
   },
   "scripts": {
+    "prebuild": "bun run scripts/generate-version.ts",
     "build": "bun build src/index.ts --compile --outfile dist/jira-mcp-server",
     "deploy": "bun run build && cp dist/jira-mcp-server ~/bin/jira-mcp-server",
     "dev": "bun run src/index.ts"
