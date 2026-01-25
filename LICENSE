@@ -1,0 +1,36 @@
+MODIFIED NON-COMMERCIAL SHARE-ALIKE LICENSE
+
+Copyright (c) 2026 Jan Baer
+
+Permission is hereby granted, free of charge,
+to any person or entity obtaining a copy of this software
+and associated documentation files (the "Software"),
+to use, copy, modify, and merge the Software for internal business purposes
+and personal projects, subject to the following conditions:
+
+1. ATTRIBUTION: The above copyright notice and this permission notice shall be
+   included in all copies or substantial portions of the Software.
+
+2. NON-COMMERCIAL LIMITATION: The Software may NOT be used as part of a
+   commercial product, service, or offering that is sold, licensed, or
+   otherwise commercialized for a fee. This includes, but is not limited to:
+   - Reselling the code as a standalone product.
+   - Including the code in a paid "Managed Service" or SaaS platform.
+   - Using the code to provide paid consulting deliverables where the code
+     itself is the primary value.
+
+3. ENTERPRISE USE: Internal use of the Software by a company or enterprise to
+   manage their own internal infrastructure (e.g., using these Ansible roles
+   to maintain their own production K3s clusters) is expressly PERMITTED
+   and encouraged.
+
+4. SHARE-ALIKE: If you remix, transform, or build upon the material, you must
+   distribute your contributions under the same license as the original.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
