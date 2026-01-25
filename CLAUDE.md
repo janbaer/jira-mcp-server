@@ -4,116 +4,77 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is an MCP (Model Context Protocol) server that exposes Jira REST API functionality to MCP clients like Claude Desktop, Cursor, and Claude Code. It allows LLMs to create Jira issues through a single tool call. Built with Bun.
+An MCP (Model Context Protocol) server that exposes Jira REST API functionality to MCP clients like Claude Desktop, Cursor, and Claude Code. Built with Bun.
 
 ## Development Commands
 
 ```bash
-# Build standalone executable with Bun runtime included
-bun run build
-
-# Build and deploy to ~/bin directory
-bun run deploy
-
-# Development mode (run from source)
-bun run dev
-
-# Run the built executable
-./dist/jira-mcp-server
+bun run build      # Build standalone executable (includes Bun runtime)
+bun run deploy     # Build and copy to ~/bin
+bun run dev        # Run from source
+bun test           # Run tests
+bun run lint       # Check lint + format (biome check)
+bun run lint:fix   # Auto-fix lint + format issues
 ```
 
-## Environment Setup
+Run a single test file:
+```bash
+bun test src/adf-schema.test.ts
+```
 
-Required environment variables:
-- `JIRA_URL` - Jira instance URL (e.g., https://your-domain.atlassian.net)
-- `JIRA_EMAIL` - Jira account email
-- `JIRA_API_TOKEN` - Jira API token
-- `JIRA_PROJECT` - Default project key
+## Environment Variables
 
-See `.env.example` for reference.
+Required: `JIRA_URL`, `JIRA_EMAIL`, `JIRA_API_TOKEN`, `JIRA_PROJECT`
 
 ## Architecture
 
 ### Build System
 
-This project uses **Bun's `--compile` flag** to create a standalone executable that includes the Bun runtime and all dependencies. The build command (`bun build src/index.ts --compile --outfile dist/jira-mcp-server`) produces a single executable file that can run without a separate Bun installation.
+Uses **Bun's `--compile` flag** to create a standalone executable. The output (`dist/jira-mcp-server`) includes the Bun runtime and runs without a separate Bun installation.
 
-The `deploy` script builds the executable and copies it to `~/bin` for system-wide access.
+### Module Structure
 
-### Core Components
+- **index.ts** - Entry point, orchestrates startup, handles `--help`
+- **config.ts** - Validates environment variables, returns `JiraConfig`
+- **server.ts** - Creates `McpServer`, registers tools with Zod schemas
+- **jira-client.ts** - Jira REST API v3 client with Basic Auth
+- **adf-schema.ts** - Zod schema for Atlassian Document Format validation
+- **types.ts** - TypeScript interfaces
+- **version.ts** - Reads version from package.json
 
-**src/index.ts** - Main entry point
-- Orchestrates server startup: config, client, server creation, and start
-- Handles help display via command-line arguments
-- Shebang (`#!/usr/bin/env bun`) allows direct execution without `bun run` prefix
+### Key Patterns
 
-**src/config.ts** - Environment configuration
-- Validates required environment variables
-- Returns `JiraConfig` with validated settings
-- Provides detailed error messages for missing variables
+**ADF Handling**: Jira requires Atlassian Document Format (ADF) for descriptions. The server accepts:
+- Plain text → converted to paragraph nodes
+- Pre-formatted ADF objects → passed directly to API
 
-**src/help.ts** - Help text display
-- Shows usage instructions and configuration examples
-- Displays required environment variables
-- Provides setup instructions for Claude Desktop, Claude Code, and other MCP clients
+**Stdio Transport**: stdout is reserved for MCP protocol. All logging goes to stderr via `console.error()`.
 
-**src/server.ts** - MCP server setup
-- Creates and configures `McpServer` instance
-- Registers the `jira-create-issue` tool with Zod schema validation
-- Connects server to stdio transport for MCP communication
-- All logging must go to stderr (stdout is reserved for MCP protocol)
+**MCP Tool Registration**:
+```typescript
+server.tool(name, description, zodSchema, async (params) => {
+  return { content: [{ type: "text", text: JSON.stringify(result) }] };
+});
+```
 
-**src/jira-client.ts** - Jira REST API client
-- Handles authentication via Basic Auth (email:token base64 encoded)
-- Accepts both plain text (simple paragraph conversion) and pre-formatted ADF objects
-- Makes API calls to Jira REST API v3
-- Provides detailed error messages by parsing Jira error responses
-
-**src/types.ts** - TypeScript type definitions
-- `JiraConfig` - Server configuration
-- `CreateIssueInput` - Issue creation parameters
-- `CreateIssueResponse` - API response structure
-- `AtlassianDocumentFormat` - ADF structure for descriptions
-
-### Key Design Patterns
-
-**ADF Conversion**: The Jira Cloud API requires descriptions in Atlassian Document Format (ADF), not plain text. The MCP server accepts both:
-- **Plain text**: Simple conversion to paragraph nodes (for basic use cases)
-- **Pre-formatted ADF objects**: Passed directly to Jira API (for advanced formatting with panels, headings, lists, etc.)
-
-This separation of concerns means the MCP server is a generic Jira API client, while formatting logic (like TODO panels, acceptance criteria panels) lives in the calling code/commands.
-
-**MCP Tool Pattern**: Tools are registered with the server using `server.tool()` which takes:
-1. Tool name (string)
-2. Description (string)
-3. Schema (Zod object)
-4. Handler function (async)
-
-**Error Handling**: All tool handlers must return structured responses with `success` boolean and either result data or error messages. Use `isError: true` in the response object to signal failures.
-
-**Stdio Transport**: The server uses stdio transport, meaning:
-- stdin/stdout are used for MCP protocol communication
-- All debug/info logging MUST go to stderr
-- Never write to stdout directly
+**Error Responses**: Return `{ isError: true }` in tool response for failures.
 
 ## Testing
 
-Use the MCP Inspector to test the server locally:
-
 ```bash
-# Build first
-bun run build
+# Unit tests
+bun test
 
-# Run inspector
+# Manual testing with MCP Inspector
+bun run build
 JIRA_URL="..." JIRA_EMAIL="..." JIRA_API_TOKEN="..." JIRA_PROJECT="..." \
-npx @modelcontextprotocol/inspector ./dist/jira-mcp-server
+  npx @modelcontextprotocol/inspector ./dist/jira-mcp-server
 ```
 
-## Common Patterns
+## Adding New Jira Operations
 
-When adding new Jira operations:
-1. Add input/response types to `types.ts`
-2. Add method to `JiraClient` class in `jira-client.ts`
-3. Register new tool in `server.ts` within `createMcpServer()` function
-4. Handle errors and return structured JSON response
-5. Update README.md with new tool documentation
+1. Add types to `types.ts`
+2. Add method to `JiraClient` class
+3. Register tool in `server.ts` with Zod schema
+4. Return structured JSON with `success` boolean
+5. Update README.md

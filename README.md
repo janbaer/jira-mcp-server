@@ -2,6 +2,22 @@
 
 An MCP (Model Context Protocol) server for creating Jira issues via the REST API. Built with Bun.
 
+## About Bun
+
+This project uses [Bun](https://bun.sh) instead of Node.js. Bun is an all-in-one toolkit for JavaScript and TypeScript—a fast, modern runtime designed as a drop-in replacement for Node.js. It ships as a single executable that includes a runtime, package manager, test runner, and bundler, with dramatically faster startup times and lower memory usage. It is also able to create single-file executable binaries with no external dependencies.
+
+### Installing Bun
+
+```bash
+curl -fsSL https://bun.sh/install | bash
+```
+
+After installation, verify it works:
+
+```bash
+bun --version
+```
+
 ## Features
 
 - Create Jira issues with a single tool call
@@ -9,7 +25,9 @@ An MCP (Model Context Protocol) server for creating Jira issues via the REST API
 - Flexible description input:
   - Plain text → automatic conversion to basic ADF paragraphs
   - Pre-formatted ADF objects → full control over formatting (panels, headings, lists, etc.)
-- Error handling with detailed error messages
+- Runtime ADF validation with Zod schemas
+- Standalone executable (no runtime dependencies)
+- `--help` flag for quick setup reference
 
 ## Prerequisites
 
@@ -261,22 +279,33 @@ The command will guide you through creating a well-structured ticket and automat
 ```
 jira-mcp-server/
 ├── src/
-│   ├── index.ts         # MCP server entry point
-│   ├── jira-client.ts   # Jira REST API client
-│   └── types.ts         # TypeScript type definitions
+│   ├── index.ts           # Entry point, orchestrates startup
+│   ├── config.ts          # Environment variable validation
+│   ├── server.ts          # MCP server setup and tool registration
+│   ├── jira-client.ts     # Jira REST API client
+│   ├── adf-schema.ts      # Zod schema for ADF validation
+│   ├── adf-schema.test.ts # ADF validation tests
+│   ├── types.ts           # TypeScript type definitions
+│   ├── help.ts            # Help text display
+│   └── version.ts         # Version from package.json
 ├── dist/
-│   └── jira-mcp-server  # Standalone executable (after bun run build)
-├── package.json
-└── README.md
+│   └── jira-mcp-server    # Standalone executable (after build)
+├── command/
+│   └── jira-ticket.md     # Interactive ticket creation command
+├── biome.json             # Linter/formatter configuration
+└── package.json
 ```
 
 ## Available Scripts
 
-| Script        | Description                                                      |
-| ------------- | ---------------------------------------------------------------- |
-| `build`       | Build standalone executable with Bun runtime included            |
-| `deploy`      | Build and copy executable to ~/bin directory                     |
-| `dev`         | Run source directly with Bun (for development)                   |
+| Script     | Description                                           |
+| ---------- | ----------------------------------------------------- |
+| `build`    | Build standalone executable with Bun runtime included |
+| `deploy`   | Build and copy executable to ~/bin directory          |
+| `dev`      | Run source directly with Bun (for development)        |
+| `test`     | Run tests with Bun                                    |
+| `lint`     | Check code with Biome (lint + format)                 |
+| `lint:fix` | Auto-fix lint and format issues                       |
 
 ## Future Improvements
 

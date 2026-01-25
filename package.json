@@ -1,6 +1,6 @@
 {
   "name": "jira-mcp-server",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "MCP server for creating Jira issues via REST API",
   "type": "module",
   "main": "dist/jira-mcp-server",

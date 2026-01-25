@@ -13,6 +13,7 @@ async function main(): Promise<void> {
 
 if (process.argv.includes("--help") || process.argv.includes("-h")) {
   showHelp();
+  process.exit(0);
 }
 
 main().catch((error) => {
