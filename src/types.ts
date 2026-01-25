@@ -57,5 +57,17 @@ export interface JiraErrorResponse {
 export interface AtlassianDocumentFormat {
   type: "doc";
   version: 1;
-  content: any[]; // Flexible array to support all ADF node types
+  content: AdfContentNode[];
+}
+
+interface AdfTextNode {
+  type: "text";
+  text: string;
+  marks?: Array<{ type: string; attrs?: Record<string, unknown> }>;
+}
+
+interface AdfContentNode {
+  type: string;
+  attrs?: Record<string, unknown>;
+  content?: Array<AdfTextNode | AdfContentNode>;
 }

@@ -20,14 +20,14 @@ export function getConfig(): JiraConfig {
         "  JIRA_URL        - Your Jira instance URL (e.g., https://your-domain.atlassian.net)\n" +
         "  JIRA_EMAIL      - Your Jira account email\n" +
         "  JIRA_API_TOKEN  - Your Jira API token\n" +
-        "  JIRA_PROJECT    - Default project key (e.g., PROJ)"
+        "  JIRA_PROJECT    - Default project key (e.g., PROJ)",
     );
   }
 
   return {
-    jiraUrl: jiraUrl!,
-    jiraEmail: jiraEmail!,
-    jiraApiToken: jiraApiToken!,
-    jiraProject: jiraProject!,
+    jiraUrl,
+    jiraEmail,
+    jiraApiToken,
+    jiraProject,
   };
 }

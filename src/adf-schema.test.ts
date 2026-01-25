@@ -1,5 +1,5 @@
-import { describe, test, expect } from "bun:test";
-import { validateAdf, isValidAdf, adfSchema } from "./adf-schema";
+import { describe, expect, test } from "bun:test";
+import { isValidAdf, validateAdf } from "./adf-schema";
 
 describe("ADF Schema Validation", () => {
   describe("Valid ADF Documents", () => {
@@ -74,7 +74,13 @@ describe("ADF Schema Validation", () => {
     });
 
     test("should validate all panel types", () => {
-      const panelTypes = ["info", "note", "warning", "success", "error"] as const;
+      const panelTypes = [
+        "info",
+        "note",
+        "warning",
+        "success",
+        "error",
+      ] as const;
 
       panelTypes.forEach((panelType) => {
         const adf = {

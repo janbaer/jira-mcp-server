@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
-import { JiraClient } from "./jira-client";
 import { getConfig } from "./config";
 import { showHelp } from "./help";
+import { JiraClient } from "./jira-client";
 import { createMcpServer, startServer } from "./server";
 
 async function main(): Promise<void> {

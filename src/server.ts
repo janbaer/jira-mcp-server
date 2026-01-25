@@ -1,15 +1,14 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
-
-import { JiraClient } from "./jira-client";
-import type { JiraConfig } from "./types";
-import { VERSION, NAME } from "./version";
 import { adfSchema } from "./adf-schema";
+import type { JiraClient } from "./jira-client";
+import type { JiraConfig } from "./types";
+import { NAME, VERSION } from "./version";
 
 export function createMcpServer(
   config: JiraConfig,
-  jiraClient: JiraClient
+  jiraClient: JiraClient,
 ): McpServer {
   const server = new McpServer({
     name: NAME,
@@ -25,26 +24,23 @@ export function createMcpServer(
         .min(1)
         .describe("Summary/title of the issue (required)"),
       description: z
-        .union([
-          z.string(),
-          adfSchema,
-        ])
+        .union([z.string(), adfSchema])
         .optional()
         .describe(
-          "Detailed description - either plain text (converted to paragraphs) or pre-formatted ADF object"
+          "Detailed description - either plain text (converted to paragraphs) or pre-formatted ADF object",
         ),
       issueType: z
         .string()
         .optional()
         .default("Task")
         .describe(
-          'Issue type (e.g., "Task", "Bug", "Story", "Epic"). Defaults to "Task"'
+          'Issue type (e.g., "Task", "Bug", "Story", "Epic"). Defaults to "Task"',
         ),
       priority: z
         .string()
         .optional()
         .describe(
-          'Priority level (e.g., "Highest", "High", "Medium", "Low", "Lowest")'
+          'Priority level (e.g., "Highest", "High", "Medium", "Low", "Lowest")',
         ),
       labels: z
         .array(z.string())
@@ -54,7 +50,7 @@ export function createMcpServer(
         .string()
         .optional()
         .describe(
-          `Project key to create the issue in. Defaults to "${config.jiraProject}"`
+          `Project key to create the issue in. Defaults to "${config.jiraProject}"`,
         ),
     },
     async (params) => {
@@ -83,7 +79,7 @@ export function createMcpServer(
                   message: `Successfully created issue ${result.key}`,
                 },
                 null,
-                2
+                2,
               ),
             },
           ],
@@ -102,14 +98,14 @@ export function createMcpServer(
                   error: errorMessage,
                 },
                 null,
-                2
+                2,
               ),
             },
           ],
           isError: true,
         };
       }
-    }
+    },
   );
 
   return server;

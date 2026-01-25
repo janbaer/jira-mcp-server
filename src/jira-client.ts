@@ -1,9 +1,9 @@
 import type {
-  JiraConfig,
+  AtlassianDocumentFormat,
   CreateIssueInput,
   CreateIssueResponse,
+  JiraConfig,
   JiraErrorResponse,
-  AtlassianDocumentFormat,
 } from "./types";
 
 /**

@@ -9,7 +9,15 @@ import { z } from "zod";
 
 // Text marks (bold, italic, etc.)
 const textMarkSchema = z.object({
-  type: z.enum(["strong", "em", "code", "link", "strike", "underline", "subsup"]),
+  type: z.enum([
+    "strong",
+    "em",
+    "code",
+    "link",
+    "strike",
+    "underline",
+    "subsup",
+  ]),
   attrs: z.record(z.any()).optional(),
 });
 
@@ -65,14 +73,16 @@ const orderedListNodeSchema = z.object({
 // Code block node
 const codeBlockNodeSchema = z.object({
   type: z.literal("codeBlock"),
-  attrs: z.object({
-    language: z.string().optional(),
-  }).optional(),
+  attrs: z
+    .object({
+      language: z.string().optional(),
+    })
+    .optional(),
   content: z.array(textNodeSchema).optional(),
 });
 
 // Union of all supported ADF node types
-const adfNodeSchema: z.ZodType<any> = z.lazy(() =>
+const adfNodeSchema: z.ZodType<AdfNode> = z.lazy(() =>
   z.union([
     paragraphNodeSchema,
     headingNodeSchema,
@@ -80,8 +90,16 @@ const adfNodeSchema: z.ZodType<any> = z.lazy(() =>
     bulletListNodeSchema,
     orderedListNodeSchema,
     codeBlockNodeSchema,
-  ])
+  ]),
 );
+
+type AdfNode =
+  | z.infer<typeof paragraphNodeSchema>
+  | z.infer<typeof headingNodeSchema>
+  | z.infer<typeof panelNodeSchema>
+  | z.infer<typeof bulletListNodeSchema>
+  | z.infer<typeof orderedListNodeSchema>
+  | z.infer<typeof codeBlockNodeSchema>;
 
 // Complete ADF document schema
 export const adfSchema = z.object({
