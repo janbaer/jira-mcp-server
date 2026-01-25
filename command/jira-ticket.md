@@ -173,9 +173,9 @@ When the user selects "Create in JIRA":
 
 3. **Handle the response:**
    - The tool returns a JSON response with `success`, `issue`, and `message` fields
+   - The `issue` object contains `id`, `key`, and `self` (the browsable URL)
    - On success: Show the issue key and URL from the response
-     Example: "Issue created successfully: VERBU-123
-              View it at: https://c24-vorsorge.atlassian.net/browse/VERBU-123"
+     Example: "Issue created successfully: {key}\nView it at: {self}"
    - On error: Show the error message from the response
 
 ## Issue Type Mapping
