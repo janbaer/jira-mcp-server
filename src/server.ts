@@ -108,6 +108,55 @@ export function createMcpServer(
     },
   );
 
+  server.tool(
+    "jira-get-issue",
+    "Get details of an existing Jira issue by its key (e.g. PROJ-123).",
+    {
+      issueKey: z.string().min(1).describe('The issue key (e.g. "PROJ-123")'),
+    },
+    async (params) => {
+      try {
+        const result = await jiraClient.getIssue(params.issueKey);
+
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: JSON.stringify(
+                {
+                  success: true,
+                  issue: result,
+                },
+                null,
+                2,
+              ),
+            },
+          ],
+        };
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : "Unknown error occurred";
+
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: JSON.stringify(
+                {
+                  success: false,
+                  error: errorMessage,
+                },
+                null,
+                2,
+              ),
+            },
+          ],
+          isError: true,
+        };
+      }
+    },
+  );
+
   return server;
 }
 

@@ -78,3 +78,5 @@ JIRA_URL="..." JIRA_EMAIL="..." JIRA_API_TOKEN="..." JIRA_PROJECT="..." \
 3. Register tool in `server.ts` with Zod schema
 4. Return structured JSON with `success` boolean
 5. Update README.md
+6. Update version in `package.json` and increase minor version
+7. Update CHANGELOG.md

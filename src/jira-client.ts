@@ -2,6 +2,7 @@ import type {
   AtlassianDocumentFormat,
   CreateIssueInput,
   CreateIssueResponse,
+  GetIssueResponse,
   JiraConfig,
   JiraErrorResponse,
 } from "./types";
@@ -131,6 +132,76 @@ export class JiraClient {
     result.self = `${this.baseUrl}/browse/${result.key}`;
 
     return result;
+  }
+
+  /**
+   * Get an existing Jira issue by its key
+   */
+  async getIssue(issueKey: string): Promise<GetIssueResponse> {
+    const response = await fetch(
+      `${this.baseUrl}/rest/api/3/issue/${encodeURIComponent(issueKey)}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: this.authHeader,
+          Accept: "application/json",
+        },
+      },
+    );
+
+    if (!response.ok) {
+      let errorMessage = `Jira API error: ${response.status} ${response.statusText}`;
+
+      try {
+        const errorBody = (await response.json()) as JiraErrorResponse;
+        if (errorBody.errorMessages && errorBody.errorMessages.length > 0) {
+          errorMessage += ` - ${errorBody.errorMessages.join(", ")}`;
+        }
+        if (errorBody.errors) {
+          const fieldErrors = Object.entries(errorBody.errors)
+            .map(([field, msg]) => `${field}: ${msg}`)
+            .join(", ");
+          if (fieldErrors) {
+            errorMessage += ` - Field errors: ${fieldErrors}`;
+          }
+        }
+      } catch {
+        // Could not parse error response
+      }
+
+      throw new Error(errorMessage);
+    }
+
+    const data = (await response.json()) as {
+      key: string;
+      fields: {
+        summary: string;
+        status: { name: string };
+        priority: { name: string } | null;
+        issuetype: { name: string };
+        assignee: { displayName: string } | null;
+        reporter: { displayName: string } | null;
+        labels: string[];
+        description: AtlassianDocumentFormat | null;
+        created: string;
+        updated: string;
+      };
+    };
+
+    return {
+      key: data.key,
+      summary: data.fields.summary,
+      status: data.fields.status.name,
+      priority: data.fields.priority?.name ?? "None",
+      issueType: data.fields.issuetype.name,
+      assignee: data.fields.assignee?.displayName ?? null,
+      reporter: data.fields.reporter?.displayName ?? null,
+      labels: data.fields.labels,
+      description: data.fields.description,
+      created: data.fields.created,
+      updated: data.fields.updated,
+      url: `${this.baseUrl}/browse/${data.key}`,
+    };
   }
 
   /**

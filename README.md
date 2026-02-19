@@ -20,6 +20,7 @@ bun --version
 
 ## Features
 
+- Fetch existing Jira issues by key
 - Create Jira issues with a single tool call
 - Support for all standard issue fields (summary, description, type, priority, labels)
 - Flexible description input:
@@ -191,6 +192,38 @@ claude mcp add jira /absolute/path/to/jira-mcp-server/dist/jira-mcp-server
 
 ## Tool Reference
 
+### `jira-get-issue`
+
+Fetches an existing Jira issue by its key and returns its details.
+
+**Parameters:**
+
+| Parameter  | Type     | Required | Description                          |
+| ---------- | -------- | -------- | ------------------------------------ |
+| `issueKey` | `string` | Yes      | The issue key (e.g. "PROJ-123")      |
+
+**Example Response:**
+
+```json
+{
+  "success": true,
+  "issue": {
+    "key": "PROJ-123",
+    "summary": "Fix login button on mobile",
+    "status": "In Progress",
+    "priority": "High",
+    "issueType": "Bug",
+    "assignee": "Jane Doe",
+    "reporter": "John Smith",
+    "labels": ["mobile", "frontend"],
+    "description": { "type": "doc", "version": 1, "content": [] },
+    "created": "2026-02-19T10:00:00.000+0000",
+    "updated": "2026-02-19T12:30:00.000+0000",
+    "url": "https://your-domain.atlassian.net/browse/PROJ-123"
+  }
+}
+```
+
 ### `jira-create-issue`
 
 Creates a new issue in Jira.
@@ -306,12 +339,13 @@ jira-mcp-server/
 | `test`     | Run tests with Bun                                    |
 | `lint`     | Check code with Biome (lint + format)                 |
 | `lint:fix` | Auto-fix lint and format issues                       |
+| `mcp-inspect` | Build and launch MCP Inspector for manual testing  |
 
 ## Future Improvements
 
 Some ideas for extending this server:
 
-- [ ] Add more Jira operations (update, delete, search, comment)
+- [ ] Add more Jira operations (update, delete, search, comment, transitions)
 - [ ] Support for custom fields
 - [ ] Support for attachments
 - [ ] Caching of project/issue type metadata

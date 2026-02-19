@@ -43,6 +43,24 @@ export interface CreateIssueResponse {
 }
 
 /**
+ * Response from fetching a Jira issue
+ */
+export interface GetIssueResponse {
+  key: string;
+  summary: string;
+  status: string;
+  priority: string;
+  issueType: string;
+  assignee: string | null;
+  reporter: string | null;
+  labels: string[];
+  description: AtlassianDocumentFormat | null;
+  created: string;
+  updated: string;
+  url: string;
+}
+
+/**
  * Jira API error response
  */
 export interface JiraErrorResponse {
