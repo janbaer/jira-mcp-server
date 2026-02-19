@@ -1,22 +1,6 @@
 # Jira MCP Server
 
-An MCP (Model Context Protocol) server for creating Jira issues via the REST API. Built with Bun.
-
-## About Bun
-
-This project uses [Bun](https://bun.sh) instead of Node.js. Bun is an all-in-one toolkit for JavaScript and TypeScript—a fast, modern runtime designed as a drop-in replacement for Node.js. It ships as a single executable that includes a runtime, package manager, test runner, and bundler, with dramatically faster startup times and lower memory usage. It is also able to create single-file executable binaries with no external dependencies.
-
-### Installing Bun
-
-```bash
-curl -fsSL https://bun.sh/install | bash
-```
-
-After installation, verify it works:
-
-```bash
-bun --version
-```
+An MCP (Model Context Protocol) server for creating and fetching Jira issues via the REST API. Built with [Bun](https://bun.sh).
 
 ## Features
 
@@ -32,116 +16,56 @@ bun --version
 
 ## Prerequisites
 
-- [Bun](https://bun.sh) v1.0+
+- [Bun](https://bun.sh) v1.0+ — install with `curl -fsSL https://bun.sh/install | bash`
 - A Jira Cloud instance
 - Jira API token (see [Atlassian API tokens](https://id.atlassian.com/manage-profile/security/api-tokens))
 
 ## Installation
 
 ```bash
-# Clone the repository
 git clone <your-repo-url>
 cd jira-mcp-server
-
-# Install dependencies
 bun install
 ```
 
 ## Configuration
 
-The server requires the following environment variables:
+The server requires these environment variables:
 
-| Variable         | Description                                              | Example                             |
-| ---------------- | -------------------------------------------------------- | ----------------------------------- |
-| `JIRA_URL`       | Your Jira instance URL                                   | `https://your-domain.atlassian.net` |
-| `JIRA_EMAIL`     | Your Jira account email                                  | `user@example.com`                  |
-| `JIRA_API_TOKEN` | Your Jira API token                                      | `your-api-token`                    |
-| `JIRA_PROJECT`   | Default project key for issue creation                   | `PROJ`                              |
-
-### Getting a Jira API Token
-
-1. Go to [Atlassian API tokens](https://id.atlassian.com/manage-profile/security/api-tokens)
-2. Click "Create API token"
-3. Give it a descriptive name and click "Create"
-4. Copy the token (you won't be able to see it again)
+| Variable         | Description                                | Example                             |
+| ---------------- | ------------------------------------------ | ----------------------------------- |
+| `JIRA_URL`       | Your Jira instance URL                     | `https://your-domain.atlassian.net` |
+| `JIRA_EMAIL`     | Your Jira account email                    | `user@example.com`                  |
+| `JIRA_API_TOKEN` | Your Jira API token                        | `your-api-token`                    |
+| `JIRA_PROJECT`   | Default project key for issue creation     | `PROJ`                              |
 
 ## Usage
 
-### Quick Reference
-
 ```bash
-# Display setup instructions and configuration examples
-./dist/jira-mcp-server --help
-```
-
-### Build
-
-```bash
-# Build standalone executable with Bun runtime included
+# Build standalone executable
 bun run build
-```
 
-This creates a standalone executable at `dist/jira-mcp-server` that includes the Bun runtime and all dependencies.
-
-### Deploy
-
-```bash
-# Build and deploy to ~/bin directory
+# Build and deploy to ~/bin
 bun run deploy
-```
 
-This builds the executable and copies it to `~/bin/jira-mcp-server` for system-wide access.
-
-### Development Mode
-
-```bash
-# Set environment variables
-export JIRA_URL="https://your-domain.atlassian.net"
-export JIRA_EMAIL="user@example.com"
-export JIRA_API_TOKEN="your-token"
-export JIRA_PROJECT="PROJ"
-
-# Run directly from source
+# Run from source (development)
 bun run dev
 
-# Or run the source file directly (since it has #!/usr/bin/env bun shebang)
-./src/index.ts
-```
+# Inspect with MCP Inspector
+bun run mcp-inspect
 
-### Production Mode
-
-```bash
-# Build the executable first
-bun run build
-
-# Run the standalone executable
-./dist/jira-mcp-server
-```
-
-### Testing with MCP Inspector
-
-```bash
-# Build first
-bun run build
-
-# Run the inspector with your server
-JIRA_URL="https://your-domain.atlassian.net" \
-JIRA_EMAIL="user@example.com" \
-JIRA_API_TOKEN="your-token" \
-JIRA_PROJECT="PROJ" \
-npx @modelcontextprotocol/inspector ./dist/jira-mcp-server
+# Display setup instructions
+./dist/jira-mcp-server --help
 ```
 
 ## Integration with MCP Clients
 
 ### Claude Desktop
 
-Add the following to your Claude Desktop configuration file:
+Add to your config file:
+- **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
 
-**macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
-**Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
-
-Production (using built executable):
 ```json
 {
   "mcpServers": {
@@ -158,28 +82,12 @@ Production (using built executable):
 }
 ```
 
-Development (running from source):
-```json
-{
-  "mcpServers": {
-    "jira": {
-      "command": "bun",
-      "args": ["run", "/absolute/path/to/jira-mcp-server/src/index.ts"],
-      "env": {
-        "JIRA_URL": "https://your-domain.atlassian.net",
-        "JIRA_EMAIL": "user@example.com",
-        "JIRA_API_TOKEN": "your-token",
-        "JIRA_PROJECT": "PROJ"
-      }
-    }
-  }
-}
-```
+For development (running from source), replace `command` with `"bun"` and add `"args": ["run", "/absolute/path/to/jira-mcp-server/src/index.ts"]`.
 
 ### Cursor
 
 1. Open Cursor Settings → Features → MCP
-2. Add a new MCP server with:
+2. Add a new MCP server:
    - **Transport type:** stdio
    - **Command:** `/absolute/path/to/jira-mcp-server/dist/jira-mcp-server`
 3. Set the environment variables in Cursor's settings
@@ -194,15 +102,13 @@ claude mcp add jira /absolute/path/to/jira-mcp-server/dist/jira-mcp-server
 
 ### `jira-get-issue`
 
-Fetches an existing Jira issue by its key and returns its details.
+Fetches an existing Jira issue by its key.
 
-**Parameters:**
+| Parameter  | Type     | Required | Description                     |
+| ---------- | -------- | -------- | ------------------------------- |
+| `issueKey` | `string` | Yes      | The issue key (e.g. "PROJ-123") |
 
-| Parameter  | Type     | Required | Description                          |
-| ---------- | -------- | -------- | ------------------------------------ |
-| `issueKey` | `string` | Yes      | The issue key (e.g. "PROJ-123")      |
-
-**Example Response:**
+**Example response:**
 
 ```json
 {
@@ -228,46 +134,40 @@ Fetches an existing Jira issue by its key and returns its details.
 
 Creates a new issue in Jira.
 
-**Parameters:**
+| Parameter     | Type              | Required | Description                                                   |
+| ------------- | ----------------- | -------- | ------------------------------------------------------------- |
+| `summary`     | `string`          | Yes      | Summary/title of the issue                                    |
+| `description` | `string` or `ADF` | No       | Plain text or pre-formatted ADF object                        |
+| `issueType`   | `string`          | No       | Issue type (default: "Task")                                  |
+| `priority`    | `string`          | No       | Priority level ("Highest", "High", "Medium", "Low", "Lowest") |
+| `labels`      | `string[]`        | No       | Labels to add to the issue                                    |
+| `projectKey`  | `string`          | No       | Override the default project key                              |
 
-| Parameter     | Type              | Required | Description                                                  |
-| ------------- | ----------------- | -------- | ------------------------------------------------------------ |
-| `summary`     | `string`          | Yes      | Summary/title of the issue                                   |
-| `description` | `string` or `ADF` | No       | Description as plain text OR pre-formatted ADF object        |
-| `issueType`   | `string`          | No       | Issue type (default: "Task")                                 |
-| `priority`    | `string`          | No       | Priority level ("Highest", "High", "Medium", "Low", "Lowest")|
-| `labels`      | `string[]`        | No       | Labels to add to the issue                                   |
-| `projectKey`  | `string`          | No       | Override the default project key                             |
+**Description formatting:**
 
-**Description Formatting:**
+Plain text is converted to ADF paragraphs automatically:
+```
+"description": "Main description.\n\nAnother paragraph."
+```
 
-You can provide the description in two ways:
+For full formatting control, pass a pre-formatted ADF object:
+```json
+"description": {
+  "type": "doc",
+  "version": 1,
+  "content": [
+    { "type": "paragraph", "content": [{ "type": "text", "text": "Main description" }] },
+    { "type": "heading", "attrs": { "level": 3 }, "content": [{ "type": "text", "text": "TODO" }] },
+    { "type": "panel", "attrs": { "panelType": "error" }, "content": [
+      { "type": "paragraph", "content": [{ "type": "text", "text": "First task" }] }
+    ]}
+  ]
+}
+```
 
-1. **Plain text** (simple):
-   ```
-   "description": "Main description text.\n\nAnother paragraph."
-   ```
-   The server converts this to basic ADF paragraphs.
+Panel types: `error` (red), `info` (blue), `warning` (yellow), `success` (green), `note` (purple).
 
-2. **Pre-formatted ADF object** (advanced):
-   ```json
-   "description": {
-     "type": "doc",
-     "version": 1,
-     "content": [
-       { "type": "paragraph", "content": [{ "type": "text", "text": "Main description" }] },
-       { "type": "heading", "attrs": { "level": 3 }, "content": [{ "type": "text", "text": "TODO" }] },
-       { "type": "panel", "attrs": { "panelType": "error" }, "content": [
-         { "type": "paragraph", "content": [{ "type": "text", "text": "First task" }] }
-       ]}
-     ]
-   }
-   ```
-   The server passes this directly to Jira, giving you full control over formatting (panels, headings, lists, etc.).
-
-Panel types: "error" (red), "info" (blue), "warning" (yellow), "success" (green), "note" (purple)
-
-**Example Response:**
+**Example response:**
 
 ```json
 {
@@ -283,29 +183,15 @@ Panel types: "error" (red), "info" (blue), "warning" (yellow), "success" (green)
 
 ## Example Commands
 
-### `jira-ticket` Command
+### `jira-ticket`
 
-An interactive command for drafting and creating Jira tickets with proper ADF formatting. This command demonstrates how to use the MCP server with advanced formatting features.
-
-**Features:**
-- Interactive ticket creation for Stories, Bugs, and Maintenance tasks
-- Smart question flow based on ticket type
-- Automatic ADF construction with red error panels for TODO and Acceptance Criteria
-- Grammar checking and refinement workflow
-- Integration with jira-mcp-server
+An interactive command for drafting and creating Jira tickets with proper ADF formatting. Supports Stories, Bugs, and Maintenance tasks with a smart question flow and automatic ADF construction.
 
 **Location:** `command/jira-ticket.md`
 
-**Usage:**
 ```bash
 /jira-ticket [optional summary]
 ```
-
-The command will guide you through creating a well-structured ticket and automatically format it with:
-- Headings for TODO and Acceptance Criteria sections
-- Red error panels for each TODO item (easily changed to green when completed)
-- Red error panels for each acceptance criterion
-- Proper paragraph formatting for descriptions
 
 ## Project Structure
 
@@ -331,19 +217,17 @@ jira-mcp-server/
 
 ## Available Scripts
 
-| Script     | Description                                           |
-| ---------- | ----------------------------------------------------- |
-| `build`    | Build standalone executable with Bun runtime included |
-| `deploy`   | Build and copy executable to ~/bin directory          |
-| `dev`      | Run source directly with Bun (for development)        |
-| `test`     | Run tests with Bun                                    |
-| `lint`     | Check code with Biome (lint + format)                 |
-| `lint:fix` | Auto-fix lint and format issues                       |
-| `mcp-inspect` | Build and launch MCP Inspector for manual testing  |
+| Script        | Description                                           |
+| ------------- | ----------------------------------------------------- |
+| `build`       | Build standalone executable with Bun runtime included |
+| `deploy`      | Build and copy executable to ~/bin directory          |
+| `dev`         | Run source directly with Bun (for development)        |
+| `test`        | Run tests with Bun                                    |
+| `lint`        | Check code with Biome (lint + format)                 |
+| `lint:fix`    | Auto-fix lint and format issues                       |
+| `mcp-inspect` | Build and launch MCP Inspector for manual testing     |
 
 ## Future Improvements
-
-Some ideas for extending this server:
 
 - [ ] Add more Jira operations (update, delete, search, comment, transitions)
 - [ ] Support for custom fields
