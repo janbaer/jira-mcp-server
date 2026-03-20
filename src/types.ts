@@ -43,6 +43,18 @@ export interface CreateIssueResponse {
 }
 
 /**
+ * Input parameters for updating a Jira issue
+ */
+export interface UpdateIssueInput {
+  /** The issue key (e.g. "PROJ-123") */
+  issueKey: string;
+  /** New summary/title for the issue */
+  summary?: string;
+  /** New description - either plain text or pre-formatted ADF object */
+  description?: string | AtlassianDocumentFormat;
+}
+
+/**
  * Response from fetching a Jira issue
  */
 export interface GetIssueResponse {

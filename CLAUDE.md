@@ -71,6 +71,17 @@ JIRA_URL="..." JIRA_EMAIL="..." JIRA_API_TOKEN="..." JIRA_PROJECT="..." \
   npx @modelcontextprotocol/inspector ./dist/jira-mcp-server
 ```
 
+## Known Issues
+
+**Zod v4 is incompatible with the MCP SDK** (as of SDK v1.27.1). The SDK's `toJsonSchemaCompat` detects Zod v4 schemas and routes them through `zod/v4-mini`'s `toJSONSchema()`, which cannot handle schemas created with classic Zod v4. This causes `tools/list` to fail with `"undefined is not an object (evaluating 'schema._zod')"`. Stay on Zod v3 until the SDK adds proper classic v4 support. After upgrading Zod, always verify tools are listed correctly:
+
+```bash
+echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test","version":"1.0"}}}
+{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}' \
+  | JIRA_URL="https://test.atlassian.net" JIRA_EMAIL="t@t.com" JIRA_API_TOKEN="x" JIRA_PROJECT="T" \
+  ./dist/jira-mcp-server 2>/dev/null
+```
+
 ## Adding New Jira Operations
 
 1. Add types to `types.ts`

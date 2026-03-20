@@ -4,7 +4,7 @@ An MCP (Model Context Protocol) server for creating and fetching Jira issues via
 
 ## Features
 
-- Fetch existing Jira issues by key
+- Fetch and update existing Jira issues
 - Create Jira issues with a single tool call
 - Support for all standard issue fields (summary, description, type, priority, labels)
 - Flexible description input:
@@ -130,6 +130,29 @@ Fetches an existing Jira issue by its key.
 }
 ```
 
+### `jira-update-issue`
+
+Updates an existing Jira issue's summary and/or description. At least one field must be provided.
+
+| Parameter     | Type              | Required | Description                        |
+| ------------- | ----------------- | -------- | ---------------------------------- |
+| `issueKey`    | `string`          | Yes      | The issue key (e.g. "PROJ-123")    |
+| `summary`     | `string`          | No       | New summary/title for the issue    |
+| `description` | `string` or `ADF` | No       | Plain text or pre-formatted ADF    |
+
+**Example response:**
+
+```json
+{
+  "success": true,
+  "issue": {
+    "key": "PROJ-123",
+    "url": "https://your-domain.atlassian.net/browse/PROJ-123"
+  },
+  "message": "Successfully updated issue PROJ-123"
+}
+```
+
 ### `jira-create-issue`
 
 Creates a new issue in Jira.
@@ -229,7 +252,7 @@ jira-mcp-server/
 
 ## Future Improvements
 
-- [ ] Add more Jira operations (update, delete, search, comment, transitions)
+- [ ] Add more Jira operations (delete, search, comment, transitions)
 - [ ] Support for custom fields
 - [ ] Support for attachments
 - [ ] Caching of project/issue type metadata

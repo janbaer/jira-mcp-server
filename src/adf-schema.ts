@@ -82,24 +82,14 @@ const codeBlockNodeSchema = z.object({
 });
 
 // Union of all supported ADF node types
-const adfNodeSchema: z.ZodType<AdfNode> = z.lazy(() =>
-  z.union([
-    paragraphNodeSchema,
-    headingNodeSchema,
-    panelNodeSchema,
-    bulletListNodeSchema,
-    orderedListNodeSchema,
-    codeBlockNodeSchema,
-  ]),
-);
-
-type AdfNode =
-  | z.infer<typeof paragraphNodeSchema>
-  | z.infer<typeof headingNodeSchema>
-  | z.infer<typeof panelNodeSchema>
-  | z.infer<typeof bulletListNodeSchema>
-  | z.infer<typeof orderedListNodeSchema>
-  | z.infer<typeof codeBlockNodeSchema>;
+const adfNodeSchema = z.union([
+  paragraphNodeSchema,
+  headingNodeSchema,
+  panelNodeSchema,
+  bulletListNodeSchema,
+  orderedListNodeSchema,
+  codeBlockNodeSchema,
+]);
 
 // Complete ADF document schema
 export const adfSchema = z.object({

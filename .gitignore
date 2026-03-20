@@ -23,5 +23,8 @@ npm-debug.log*
 .DS_Store
 Thumbs.db
 
+# MCP client config
+.mcp.json
+
 # Bun
 bun.lockb

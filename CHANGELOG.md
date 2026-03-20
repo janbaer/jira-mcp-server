@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-03-20
+
+### Added
+
+- `jira-update-issue` tool to update an existing issue's summary and/or description
+- `jira-ticket` command now supports updating existing tickets by passing an issue key
+
+### Changed
+
+- Simplified ADF schema by removing unnecessary `z.lazy()` wrapper
+
 ## [1.2.0] - 2026-02-19
 
 ### Added

@@ -1,12 +1,12 @@
 ---
 name: jira-ticket
-description: Draft and create a JIRA ticket (Story, Bug, or Maintenance task) using the Jira MCP server
-argument-hint: summary
+description: Draft and create a JIRA ticket (Story, Bug, or Maintenance task), or update an existing one, using the Jira MCP server
+argument-hint: summary or issue key (e.g. PROJ-123)
 ---
 
 # JIRA Ticket Drafter
 
-You help draft well-structured JIRA tickets by gathering the necessary information interactively, with the option to create the ticket directly in JIRA using the Jira MCP server.
+You help draft well-structured JIRA tickets by gathering the necessary information interactively, with the option to create or update tickets directly in JIRA using the Jira MCP server.
 
 ## Pre-requisites
 
@@ -14,9 +14,76 @@ This command requires the **Jira MCP server** to be configured and available.
 
 ## User Input
 
-Summary (if provided as argument): $ARGUMENTS
+Argument (if provided): $ARGUMENTS
 
-If $ARGUMENTS is provided, use it as the **Summary** and skip asking for it in Step 2.
+## Detecting Create vs Update Mode
+
+If $ARGUMENTS matches an issue key pattern (e.g. `PROJ-123`, `VERBU-456` — uppercase letters, a hyphen, then digits), enter **Update Mode**. Otherwise, enter **Create Mode** and treat $ARGUMENTS as the summary.
+
+---
+
+## Update Mode
+
+### Step U1: Fetch the existing issue
+
+Call `jira-get-issue` with the issue key from $ARGUMENTS.
+
+If the API returns an error (issue not found), tell the user:
+> "Issue {key} was not found. Please check the key and try again."
+
+Then stop — do not proceed further.
+
+### Step U2: Show current content
+
+Display the current issue to the user:
+
+```markdown
+## {key}: {summary}
+
+**Type:** {issueType} | **Status:** {status} | **Priority:** {priority}
+**Assignee:** {assignee} | **Reporter:** {reporter}
+
+### Description
+{description rendered as readable text}
+```
+
+### Step U3: Ask what to update
+
+Ask the user: "What would you like to change?"
+
+Present options:
+1. **Summary** — change the title
+2. **Description** — rewrite the description
+3. **Both** — change summary and description
+
+For description changes, gather the new content interactively (same question flow as create mode based on the issue type, but pre-filled with existing content where possible). The user can skip fields they don't want to change.
+
+### Step U4: Preview and confirm
+
+Show the updated ticket as a markdown diff — display what changed. Then present options:
+
+1. **Update in JIRA** — submit the changes
+2. **Make changes** — edit the draft further
+3. **Cancel** — discard changes
+
+### Step U5: Update in JIRA (if selected)
+
+When the user selects "Update in JIRA":
+
+1. If updating the description, construct the ADF object using the same formatting rules as create mode (see Step 5 below for ADF construction details)
+2. Call `jira-update-issue` with:
+   - `issueKey`: the issue key
+   - `summary`: the new summary (only if changed)
+   - `description`: the new ADF description (only if changed)
+3. Handle the response:
+   - On success: "Issue {key} updated successfully.\nView it at: {url}"
+   - On error: Show the error message
+
+---
+
+## Create Mode
+
+If $ARGUMENTS is provided and is not an issue key, use it as the **Summary** and skip asking for it in Step 2.
 
 Guess from the passed summary what type of ticket it could be.
 So the word `fix` sounds like a bug. If it start with `Infrastructure` it is usually a maintenance task. So you can preselect the ticket type, but always ask the user what type it should be
@@ -101,7 +168,7 @@ Check for grammar errors and fix them.
 
 Show the draft to the user as markdown, then use the AskUserQuestion tool to present these options as an interactive selection:
 
-1. **Create in JIRA** - Submit the ticket to JIRA with using the jira-mcp-server
+1. **Create in JIRA** - Submit the ticket to JIRA
 2. **Make changes** - Edit specific fields in the ticket
 3. **Add more details** - Provide additional information
 4. **Start over** - Discard this draft and begin again

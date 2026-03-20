@@ -157,6 +157,94 @@ export function createMcpServer(
     },
   );
 
+  server.tool(
+    "jira-update-issue",
+    "Update an existing Jira issue's summary and/or description. At least one field must be provided.",
+    {
+      issueKey: z.string().min(1).describe('The issue key (e.g. "PROJ-123")'),
+      summary: z
+        .string()
+        .min(1)
+        .optional()
+        .describe("New summary/title for the issue"),
+      description: z
+        .union([z.string(), adfSchema])
+        .optional()
+        .describe(
+          "New description - either plain text (converted to paragraphs) or pre-formatted ADF object",
+        ),
+    },
+    async (params) => {
+      if (!params.summary && !params.description) {
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: JSON.stringify(
+                {
+                  success: false,
+                  error:
+                    "At least one of 'summary' or 'description' must be provided",
+                },
+                null,
+                2,
+              ),
+            },
+          ],
+          isError: true,
+        };
+      }
+
+      try {
+        const result = await jiraClient.updateIssue({
+          issueKey: params.issueKey,
+          summary: params.summary,
+          description: params.description,
+        });
+
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: JSON.stringify(
+                {
+                  success: true,
+                  issue: {
+                    key: result.key,
+                    url: result.url,
+                  },
+                  message: `Successfully updated issue ${result.key}`,
+                },
+                null,
+                2,
+              ),
+            },
+          ],
+        };
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : "Unknown error occurred";
+
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: JSON.stringify(
+                {
+                  success: false,
+                  error: errorMessage,
+                },
+                null,
+                2,
+              ),
+            },
+          ],
+          isError: true,
+        };
+      }
+    },
+  );
+
   return server;
 }
 

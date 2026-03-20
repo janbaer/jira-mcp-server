@@ -1,6 +1,6 @@
 {
   "name": "jira-mcp-server",
-  "version": "1.1.0",
+  "version": "1.3.0",
   "description": "MCP server for creating Jira issues via REST API",
   "type": "module",
   "main": "dist/jira-mcp-server",
@@ -17,12 +17,12 @@
     "mcp-inspect": "bun run build && npx @modelcontextprotocol/inspector ./dist/jira-mcp-server"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.12.1",
-    "zod": "^3.25.34"
+    "@modelcontextprotocol/sdk": "^1.27.1",
+    "zod": "3"
   },
   "devDependencies": {
-    "@types/node": "^22.10.0",
-    "bun-types": "^1.3.6"
+    "@types/node": "^22.19.15",
+    "bun-types": "^1.3.11"
   },
   "engines": {
     "bun": ">=1.0.0"

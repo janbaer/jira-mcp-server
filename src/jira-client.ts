@@ -5,6 +5,7 @@ import type {
   GetIssueResponse,
   JiraConfig,
   JiraErrorResponse,
+  UpdateIssueInput,
 } from "./types";
 
 /**
@@ -201,6 +202,67 @@ export class JiraClient {
       created: data.fields.created,
       updated: data.fields.updated,
       url: `${this.baseUrl}/browse/${data.key}`,
+    };
+  }
+
+  /**
+   * Update an existing Jira issue
+   */
+  async updateIssue(
+    input: UpdateIssueInput,
+  ): Promise<{ key: string; url: string }> {
+    const fields: Record<string, unknown> = {};
+
+    if (input.summary) {
+      fields.summary = input.summary;
+    }
+
+    if (input.description) {
+      fields.description =
+        typeof input.description === "string"
+          ? this.toADF(input.description)
+          : input.description;
+    }
+
+    const response = await fetch(
+      `${this.baseUrl}/rest/api/3/issue/${encodeURIComponent(input.issueKey)}`,
+      {
+        method: "PUT",
+        headers: {
+          Authorization: this.authHeader,
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({ fields }),
+      },
+    );
+
+    if (!response.ok) {
+      let errorMessage = `Jira API error: ${response.status} ${response.statusText}`;
+
+      try {
+        const errorBody = (await response.json()) as JiraErrorResponse;
+        if (errorBody.errorMessages && errorBody.errorMessages.length > 0) {
+          errorMessage += ` - ${errorBody.errorMessages.join(", ")}`;
+        }
+        if (errorBody.errors) {
+          const fieldErrors = Object.entries(errorBody.errors)
+            .map(([field, msg]) => `${field}: ${msg}`)
+            .join(", ");
+          if (fieldErrors) {
+            errorMessage += ` - Field errors: ${fieldErrors}`;
+          }
+        }
+      } catch {
+        // Could not parse error response
+      }
+
+      throw new Error(errorMessage);
+    }
+
+    return {
+      key: input.issueKey,
+      url: `${this.baseUrl}/browse/${input.issueKey}`,
     };
   }
 
