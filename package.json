@@ -10,6 +10,7 @@
   "scripts": {
     "build": "bun build src/index.ts --compile --outfile dist/jira-mcp-server",
     "deploy": "bun run build && cp dist/jira-mcp-server ~/bin/jira-mcp-server",
+    "deploy-and-sign": "bun run build && cp dist/jira-mcp-server ~/bin/jira-mcp-server && codesign -s - ~/bin/jira-mcp-server",
     "dev": "bun run src/index.ts",
     "test": "bun test",
     "lint": "bunx biome check src/",

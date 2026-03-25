@@ -67,6 +67,9 @@ bun run build
 # Build and deploy to ~/bin
 bun run deploy
 
+# Build, deploy, and sign (required on macOS — see note below)
+bun run deploy-and-sign
+
 # Run from source (development)
 bun run dev
 
@@ -76,6 +79,12 @@ bun run mcp-inspect
 # Display setup instructions
 ./dist/jira-mcp-server --help
 ```
+
+### macOS: use `deploy-and-sign`
+
+On macOS, use `bun run deploy-and-sign` instead of `bun run deploy`. When `bun build --compile` produces a binary, it embeds a code signature. Copying the file with `cp` invalidates that signature because macOS recalculates file hashes on copy. Gatekeeper then kills the binary with `SIGKILL` when you try to run it from the new location.
+
+`deploy-and-sign` adds an ad-hoc re-signing step (`codesign -s -`) after the copy, which satisfies macOS without requiring an Apple Developer certificate.
 
 ## Integration with MCP Clients
 
@@ -263,6 +272,7 @@ jira-mcp-server/
 | ------------- | ----------------------------------------------------- |
 | `build`       | Build standalone executable with Bun runtime included |
 | `deploy`      | Build and copy executable to ~/bin directory          |
+| `deploy-and-sign` | Build, copy, and ad-hoc sign (required on macOS) |
 | `dev`         | Run source directly with Bun (for development)        |
 | `test`        | Run tests with Bun                                    |
 | `lint`        | Check code with Biome (lint + format)                 |
