@@ -41,6 +41,7 @@ Uses **Bun's `--compile` flag** to create a standalone executable. The output (`
 - **adf-schema.ts** - Zod schema for Atlassian Document Format validation
 - **types.ts** - TypeScript interfaces
 - **version.ts** - Reads version from package.json
+- **help.ts** - `--help` output with env var and client config examples
 
 ### Key Patterns
 
@@ -65,10 +66,9 @@ server.tool(name, description, zodSchema, async (params) => {
 # Unit tests
 bun test
 
-# Manual testing with MCP Inspector
-bun run build
+# Interactive testing with MCP Inspector (builds first)
 JIRA_URL="..." JIRA_EMAIL="..." JIRA_API_TOKEN="..." JIRA_PROJECT="..." \
-  npx @modelcontextprotocol/inspector ./dist/jira-mcp-server
+  bun run mcp-inspect
 ```
 
 ## Known Issues
