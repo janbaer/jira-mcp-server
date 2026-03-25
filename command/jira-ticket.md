@@ -66,9 +66,35 @@ Show the updated ticket as a markdown diff — display what changed. Then presen
 2. **Make changes** — edit the draft further
 3. **Cancel** — discard changes
 
-### Step U5: Update in JIRA (if selected)
+### Step U5: Re-fetch before submitting
 
-When the user selects "Update in JIRA":
+Before calling `jira-update-issue`, **always** call `jira-get-issue` again with the same key to get the latest state from Jira.
+
+Compare the freshly fetched issue against the snapshot from Step U1:
+
+- If **summary or description changed remotely** since you first fetched it, show the user what changed:
+
+  ```
+  ⚠️ This issue was modified remotely since you started editing.
+
+  Remote changes detected:
+  - Summary: "{old}" → "{new}"   (or "unchanged")
+  - Description: changed / unchanged
+
+  Your intended changes:
+  - Summary: ...
+  - Description: ...
+
+  How do you want to proceed?
+  1. Apply my changes anyway (overwrite remote changes)
+  2. Abort — let me review the remote changes first
+  ```
+
+  Wait for the user to choose before continuing.
+
+- If **nothing changed remotely**, proceed silently without bothering the user.
+
+### Step U6: Update in JIRA
 
 1. If updating the description, construct the ADF object using the same formatting rules as create mode (see Step 5 below for ADF construction details)
 2. Call `jira-update-issue` with:
