@@ -17,6 +17,7 @@ An MCP (Model Context Protocol) server for creating and fetching Jira issues via
 ## Prerequisites
 
 - [Bun](https://bun.sh) v1.0+ — install with `curl -fsSL https://bun.sh/install | bash`
+  - Or use [devbox](https://www.jetify.com/devbox) for an isolated environment without a permanent Bun installation (see below)
 - A Jira Cloud instance
 - Jira API token (see [Atlassian API tokens](https://id.atlassian.com/manage-profile/security/api-tokens))
 
@@ -27,6 +28,24 @@ git clone <your-repo-url>
 cd jira-mcp-server
 bun install
 ```
+
+### Using devbox (no permanent Bun installation)
+
+If you prefer not to install Bun globally, [devbox](https://www.jetify.com/devbox) provides an isolated shell with Bun available:
+
+```bash
+# Install devbox (one-time)
+curl -fsSL https://get.jetify.com/devbox | bash
+
+# Enter the devbox shell (installs Bun automatically)
+devbox shell
+
+# Now use bun as normal
+bun install
+bun run build
+```
+
+Run `exit` to leave the devbox shell. Bun is not added to your system outside of it.
 
 ## Configuration
 
