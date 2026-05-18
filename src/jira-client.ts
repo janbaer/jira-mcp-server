@@ -94,6 +94,13 @@ export class JiraClient {
       (body.fields as Record<string, unknown>).labels = input.labels;
     }
 
+    // Add optional parent
+    if (input.parentKey !== undefined) {
+      (body.fields as Record<string, unknown>).parent = {
+        key: input.parentKey,
+      };
+    }
+
     // Make the API request
     const response = await fetch(`${this.baseUrl}/rest/api/3/issue`, {
       method: "POST",

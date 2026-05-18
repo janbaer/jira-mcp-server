@@ -28,6 +28,8 @@ export interface CreateIssueInput {
   labels?: string[];
   /** Override the default project key */
   projectKey?: string;
+  /** Parent issue key (e.g. "PROJ-10") — creates the issue as a child */
+  parentKey?: string;
 }
 
 /**

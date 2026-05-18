@@ -235,6 +235,7 @@ Creates a new issue in Jira.
 | `priority`    | `string`          | No       | Priority level ("Highest", "High", "Medium", "Low", "Lowest") |
 | `labels`      | `string[]`        | No       | Labels to add to the issue                                    |
 | `projectKey`  | `string`          | No       | Override the default project key                              |
+| `parentKey`   | `string`          | No       | Parent issue key (e.g. "PROJ-10") — creates as a child issue  |
 
 **Description formatting:**
 

@@ -52,6 +52,12 @@ export function createMcpServer(
         .describe(
           `Project key to create the issue in. Defaults to "${config.jiraProject}"`,
         ),
+      parentKey: z
+        .string()
+        .optional()
+        .describe(
+          'Parent issue key (e.g. "PROJ-10") — creates the issue as a child of that issue',
+        ),
     },
     async (params) => {
       try {
@@ -62,6 +68,7 @@ export function createMcpServer(
           priority: params.priority,
           labels: params.labels,
           projectKey: params.projectKey,
+          parentKey: params.parentKey,
         });
 
         return {
