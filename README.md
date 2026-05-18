@@ -128,6 +128,48 @@ claude mcp add jira /absolute/path/to/jira-mcp-server/dist/jira-mcp-server
 
 ## Tool Reference
 
+### `jira-search-issues`
+
+Searches for Jira issues using a JQL query. Returns a list of matching issues with key fields.
+
+| Parameter    | Type     | Required | Description                                         |
+| ------------ | -------- | -------- | --------------------------------------------------- |
+| `jql`        | `string` | Yes      | JQL query string                                    |
+| `maxResults` | `number` | No       | Maximum results to return (1–100, default 20)       |
+
+**JQL examples:**
+
+```
+project = MYPROJ AND status = "In Progress"
+assignee = currentUser() AND sprint in openSprints()
+project = MYPROJ AND labels = "backend" ORDER BY created DESC
+```
+
+**Example response:**
+
+```json
+{
+  "success": true,
+  "total": 42,
+  "returned": 20,
+  "issues": [
+    {
+      "key": "PROJ-123",
+      "summary": "Fix login button on mobile",
+      "status": "In Progress",
+      "priority": "High",
+      "issueType": "Bug",
+      "assignee": "Jane Doe",
+      "reporter": "John Smith",
+      "labels": ["mobile", "frontend"],
+      "created": "2026-02-19T10:00:00.000+0000",
+      "updated": "2026-02-19T12:30:00.000+0000",
+      "url": "https://your-domain.atlassian.net/browse/PROJ-123"
+    }
+  ]
+}
+```
+
 ### `jira-get-issue`
 
 Fetches an existing Jira issue by its key.

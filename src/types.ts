@@ -73,6 +73,26 @@ export interface GetIssueResponse {
 }
 
 /**
+ * Input parameters for searching Jira issues via JQL
+ */
+export interface SearchIssuesInput {
+  /** JQL query string (e.g. 'project = MYPROJ AND status = "In Progress"') */
+  jql: string;
+  /** Maximum number of results to return (1–100, default 20) */
+  maxResults?: number;
+}
+
+/**
+ * Response from searching Jira issues
+ */
+export interface SearchIssuesResponse {
+  /** Total number of issues matching the query (may exceed issues.length) */
+  total: number;
+  /** List of matching issues */
+  issues: GetIssueResponse[];
+}
+
+/**
  * Jira API error response
  */
 export interface JiraErrorResponse {

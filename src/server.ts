@@ -245,6 +245,72 @@ export function createMcpServer(
     },
   );
 
+  server.tool(
+    "jira-search-issues",
+    "Search for Jira issues using a JQL query. Returns a list of matching issues with key fields.",
+    {
+      jql: z
+        .string()
+        .min(1)
+        .describe(
+          "JQL query string (e.g. 'project = MYPROJ AND status = \"In Progress\"')",
+        ),
+      maxResults: z
+        .number()
+        .int()
+        .min(1)
+        .max(100)
+        .optional()
+        .describe("Maximum number of results to return (1–100, default 20)"),
+    },
+    async (params) => {
+      try {
+        const result = await jiraClient.searchIssues({
+          jql: params.jql,
+          maxResults: params.maxResults,
+        });
+
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: JSON.stringify(
+                {
+                  success: true,
+                  total: result.total,
+                  returned: result.issues.length,
+                  issues: result.issues,
+                },
+                null,
+                2,
+              ),
+            },
+          ],
+        };
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : "Unknown error occurred";
+
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: JSON.stringify(
+                {
+                  success: false,
+                  error: errorMessage,
+                },
+                null,
+                2,
+              ),
+            },
+          ],
+          isError: true,
+        };
+      }
+    },
+  );
+
   return server;
 }
 

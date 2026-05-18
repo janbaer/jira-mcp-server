@@ -5,6 +5,8 @@ import type {
   GetIssueResponse,
   JiraConfig,
   JiraErrorResponse,
+  SearchIssuesInput,
+  SearchIssuesResponse,
   UpdateIssueInput,
 } from "./types";
 
@@ -202,6 +204,94 @@ export class JiraClient {
       created: data.fields.created,
       updated: data.fields.updated,
       url: `${this.baseUrl}/browse/${data.key}`,
+    };
+  }
+
+  /**
+   * Search for Jira issues using a JQL query
+   */
+  async searchIssues(input: SearchIssuesInput): Promise<SearchIssuesResponse> {
+    const maxResults = Math.min(input.maxResults ?? 20, 100);
+    const fields = [
+      "summary",
+      "status",
+      "priority",
+      "issuetype",
+      "assignee",
+      "reporter",
+      "labels",
+      "created",
+      "updated",
+    ];
+
+    // /rest/api/3/search is deprecated on Jira Cloud; /rest/api/3/search/jql is the replacement
+    const response = await fetch(`${this.baseUrl}/rest/api/3/search/jql`, {
+      method: "POST",
+      headers: {
+        Authorization: this.authHeader,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({ jql: input.jql, maxResults, fields }),
+    });
+
+    if (!response.ok) {
+      let errorMessage = `Jira API error: ${response.status} ${response.statusText}`;
+
+      try {
+        const errorBody = (await response.json()) as JiraErrorResponse;
+        if (errorBody.errorMessages && errorBody.errorMessages.length > 0) {
+          errorMessage += ` - ${errorBody.errorMessages.join(", ")}`;
+        }
+        if (errorBody.errors) {
+          const fieldErrors = Object.entries(errorBody.errors)
+            .map(([field, msg]) => `${field}: ${msg}`)
+            .join(", ");
+          if (fieldErrors) {
+            errorMessage += ` - Field errors: ${fieldErrors}`;
+          }
+        }
+      } catch {
+        // Could not parse error response
+      }
+
+      throw new Error(errorMessage);
+    }
+
+    const data = (await response.json()) as {
+      total: number;
+      issues: Array<{
+        key: string;
+        fields: {
+          summary: string;
+          status: { name: string };
+          priority: { name: string } | null;
+          issuetype: { name: string };
+          assignee: { displayName: string } | null;
+          reporter: { displayName: string } | null;
+          labels: string[];
+          created: string;
+          updated: string;
+        };
+      }>;
+    };
+
+    return {
+      total: data.total,
+      issues: data.issues.map((issue) => ({
+        key: issue.key,
+        summary: issue.fields.summary,
+        status: issue.fields.status.name,
+        priority: issue.fields.priority?.name ?? "None",
+        issueType: issue.fields.issuetype.name,
+        assignee: issue.fields.assignee?.displayName ?? null,
+        reporter: issue.fields.reporter?.displayName ?? null,
+        labels: issue.fields.labels,
+        description: null, // intentionally omitted from search results; use getIssue() if needed
+        created: issue.fields.created,
+        updated: issue.fields.updated,
+        url: `${this.baseUrl}/browse/${issue.key}`,
+      })),
     };
   }
 
